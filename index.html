@@ -5,18 +5,43 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Yuki Igarashi's Website</title>
         <link rel="stylesheet" href="styles.css">
-        <link rel="icon" type="image/png" href="favicon.png">
+        <link rel="icon" type="image/png" href="image/favicon.png">
     </head>
     <body>
-        <div class="header">
-            <h1>Yuki Igarashi's Website</h1>
-        </div>
         <div class="container">
+            <h1>Yuki Igarashi's Website</h1>
             <div class="intro-card">
                 <img src="image/icon.png" alt="icon" class="icon">
                 <h2>Yuki Igarashi</h2>
                 <p class="bio">Ex-public services consultant / Studying arbitrage trading / Currently recovering after surgery</p>
+                <div class="links">
+                    <a href="https://github.com/ykigrs">GitHub</a>
+                    <a href="https://medium.com/@ykigrs">Medium</a>
+                </div>
+            </div>
+
+            <h2>Posts</h2>
+            <div class="posts">
+                <!-- Posts will be dynamically inserted here -->
             </div>
         </div>
+        <script>
+            fetch('posts.json')
+                .then(response => response.json())
+                .then(posts => {
+                    const postsContainer = document.getElementById('posts');
+                    posts.forEach(post => {
+                        const postElement = document.createElement('div');
+                        postElement.className = 'post';
+                        postElement.innerHTML = `
+                            <h3><a href="posts/${post.filename}">${post.title}</a></h3>
+                            <p class="description">${post.description}</p>
+                            <p class="date">${post.date}</p>
+                        `;
+                        postsContainer.appendChild(postElement);
+                    });
+                })
+                .catch(error => console.error('Error loading posts:', error));
+        </script>
     </body>
 </html>
