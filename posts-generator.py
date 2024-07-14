@@ -1,43 +1,61 @@
 import os
 import json
-import re
-from datetime import datetime
+from markdown2 import Markdown
+from jinja2 import Environment, FileSystemLoader
 
-def extract_front_matter(content):
-    front_matter = {}
-    match = re.match(r'^---\s+(.*?)\s+---', content, re.DOTALL)
-    if match:
-        front_matter_text = match.group(1)
-        for line in front_matter_text.split('\n'):
-            if ':' in line:
-                key, value = line.split(':', 1)
-                front_matter[key.strip()] = value.strip()
-    return front_matter
+# Markdownパーサーの設定
+markdowner = Markdown(extras=["metadata", "fenced-code-blocks"])
 
-def get_posts_data():
-    posts = []
-    posts_dir = 'posts'
+# Jinja2テンプレートエンジンの設定
+env = Environment(loader=FileSystemLoader('.'))
+post_template = env.get_template('post_template.html')
+
+def convert_md_to_html(md_file_path, output_dir):
+    with open(md_file_path, 'r', encoding='utf-8') as md_file:
+        md_content = md_file.read()
+    
+    # MarkdownをHTMLに変換し、メタデータを取得
+    html_content = markdowner.convert(md_content)
+    metadata = html_content.metadata
+
+    # テンプレートにデータを渡してHTMLを生成
+    html_output = post_template.render(
+        title=metadata.get('title', 'Untitled'),
+        date=metadata.get('date', ''),
+        content=html_content
+    )
+
+    # 出力ファイル名を決定（.mdを.htmlに置換）
+    output_file_name = os.path.splitext(os.path.basename(md_file_path))[0] + '.html'
+    output_file_path = os.path.join(output_dir, output_file_name)
+
+    # HTMLファイルを保存
+    with open(output_file_path, 'w', encoding='utf-8') as html_file:
+        html_file.write(html_output)
+
+    return output_file_name, metadata
+
+def process_all_posts(posts_dir, output_dir):
+    posts_data = []
     for filename in os.listdir(posts_dir):
         if filename.endswith('.md'):
-            file_path = os.path.join(posts_dir, filename)
-            with open(file_path, 'r', encoding='utf-8') as file:
-                content = file.read()
+            md_file_path = os.path.join(posts_dir, filename)
+            html_file_name, metadata = convert_md_to_html(md_file_path, output_dir)
             
-            front_matter = extract_front_matter(content)
-            
-            post = {
-                'title': front_matter.get('title', 'Untitled'),
-                'date': front_matter.get('date', datetime.now().strftime('%Y-%m-%d')),
-                'description': front_matter.get('description', ''),
-                'filename': filename
-            }
-            posts.append(post)
-    
-    return sorted(posts, key=lambda x: x['date'], reverse=True)
+            posts_data.append({
+                'title': metadata.get('title', 'Untitled'),
+                'date': metadata.get('date', ''),
+                'description': metadata.get('description', ''),
+                'filename': html_file_name
+            })
+
+    # posts.jsonを更新
+    posts_data.sort(key=lambda x: x['date'], reverse=True)
+    with open('posts.json', 'w', encoding='utf-8') as json_file:
+        json.dump(posts_data, json_file, ensure_ascii=False, indent=2)
 
 if __name__ == '__main__':
-    posts_data = get_posts_data()
-    with open('posts.json', 'w', encoding='utf-8') as f:
-        json.dump(posts_data, f, ensure_ascii=False, indent=2)
-
-print("posts.json has been generated successfully.")
+    posts_dir = 'posts'  # Markdownファイルのディレクトリ
+    output_dir = 'posts'  # HTML出力先ディレクトリ（同じディレクトリに出力）
+    process_all_posts(posts_dir, output_dir)
+    print("All posts have been converted to HTML and posts.json has been updated.")
