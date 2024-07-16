@@ -11,6 +11,23 @@ body {
     max-width: 800px;
     margin: 0 auto;
     padding: 20px;
+    position: relative;
+}
+
+.top-nav {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+}
+
+.links {
+    display: flex;
+    gap: 20px;
+}
+
+.links a {
+    color: #0366d6;
+    text-decoration: none;
 }
 
 h1, h2 {
@@ -27,9 +44,6 @@ h1, h2 {
 }
 
 .icon-section {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
     margin-right: 30px;
 }
 
@@ -41,35 +55,19 @@ h1, h2 {
     border: 5px solid white;
 }
 
-.links {
-    margin-top: 10px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-}
-
 .intro-content {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items: flex-start;
     flex-grow: 1;
 }
 
-.bio, .links {
+.bio {
     text-align: left;
-    width: 100%;
 }
 
-.bio h3, .links h3 {
+.bio h3 {
     margin-top: 0;
-}
-
-.links a {
-    margin: 5px 0;
-    color: #0366d6;
-    text-decoration: none;
 }
 
 .posts {
@@ -94,6 +92,18 @@ h1, h2 {
 }
 
 @media (max-width: 600px) {
+    .container {
+        padding-top: 60px;
+    }
+
+    .top-nav {
+        position: absolute;
+    }
+
+    .links {
+        justify-content: center;
+    }
+
     .intro-card {
         flex-direction: column;
         align-items: center;
@@ -107,5 +117,9 @@ h1, h2 {
     .intro-content {
         align-items: center;
         text-align: center;
+    }
+
+    .bio {
+        text-align: left;
     }
 }

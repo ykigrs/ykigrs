@@ -18,6 +18,8 @@ def convert_md_to_html(md_file_path, output_dir):
     html_content = markdowner.convert(md_content)
     metadata = html_content.metadata
 
+    slug = metadata.get('slug', metadata.get('title', 'untitled').lower().replace(' ', '-'))
+
     # Generate metadata
     html_output = post_template.render(
         title=metadata.get('title', 'Untitled'),
@@ -46,7 +48,8 @@ def process_all_posts(posts_dir, output_dir):
                 'title': metadata.get('title', 'Untitled'),
                 'date': metadata.get('date', ''),
                 'description': metadata.get('description', ''),
-                'filename': html_file_name
+                'filename': html_file_name,
+                'slug': metadata.get('slug', '')
             })
 
     # Update posts.json

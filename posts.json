@@ -1,8 +1,9 @@
 [
   {
-    "title": "first-article",
+    "title": "My first Article",
     "date": "2024-07-15",
     "description": "",
-    "filename": "first-article.html"
+    "filename": "first-article.html",
+    "slug": "first-article"
   }
 ]
